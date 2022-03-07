@@ -34,14 +34,14 @@ class ConfigContainer:
         try:
             conf_parser = ConfigParser()
             conf_parser.read(self.filename)
-            self.bot_name = conf_parser.get('bot-settings', 'Bot-Client-Name')
+            self.bot_name = conf_parser.get('bot-settings', 'bot-client-name')
             self.hostname2 = conf_parser.get('bot-settings', 'hostname_server1')
             self.hostname1 = conf_parser.get('bot-settings', 'hostname_server2')
             self.port1 = conf_parser.getint('bot-settings', 'port1')
             self.port2 = conf_parser.getint('bot-settings', 'port2')
             self.pw1 = conf_parser.get('bot-settings', 'pw1')
             self.pw2 = conf_parser.get('bot-settings', 'pw2')
-            self.public_reply = conf_parser.getboolean('bot-settings', 'public_rely')
+            self.public_reply = conf_parser.getboolean('bot-settings', 'public_reply')
             self.broadcast_changes = conf_parser.getboolean('bot-settings', 'broadcast_changes')
             bot_cert_temp = conf_parser.get('bot-settings', 'certificate')
             if bot_cert_temp:

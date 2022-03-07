@@ -2,8 +2,8 @@ import unittest
 import pytest
 import mock
 from pymumble_py3.constants import PYMUMBLE_CONN_STATE_CONNECTED, PYMUMBLE_CONN_STATE_NOT_CONNECTED
-from ..src.Constants import *
-from ..src.InterMumbleBotClient import get_real_users, update_channel_name, send_multi_line_msg
+from src.Constants import *
+from src.InterMumbleBotClient import get_real_users, update_channel_name, send_multi_line_msg
 
 dummy = ""
 
