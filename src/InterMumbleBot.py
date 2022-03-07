@@ -1,6 +1,7 @@
 from InterMumbleBotClient import InterMumbleBotClient
 from ConfigContainer import ConfigContainer
 import time
+import os
 
 
 class InterMumbleBot:
@@ -19,7 +20,7 @@ class InterMumbleBot:
 
 
 if __name__ == '__main__':
-    config = ConfigContainer('../settings.ini')
+    config = ConfigContainer(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'settings.ini'))
     myInterMumbleBot = InterMumbleBot(config, 2)
     myInterMumbleBot.loop()
 

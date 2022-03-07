@@ -45,7 +45,7 @@ class ConfigContainer:
             self.broadcast_changes = conf_parser.getboolean('bot-settings', 'broadcast_changes')
             bot_cert_temp = conf_parser.get('bot-settings', 'certificate')
             if bot_cert_temp:
-                self.bot_certificate = os.path.join('..', bot_cert_temp)
+                self.bot_certificate = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', bot_cert_temp)
         except ValueError:
             raise ConfigError(CC_EXCEPT_INI_NOT_VALID)
 
