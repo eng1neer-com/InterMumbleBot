@@ -23,7 +23,7 @@ class TestConfigContainer(unittest.TestCase):
                 mock.patch.object(ConfigParser, 'getint', return_value=42), \
                 mock.patch.object(ConfigParser, 'getboolean', return_value=False):
             with pytest.raises(ConfigError) as e:
-                ConfigContainer('settings.ini')
+                ConfigContainer('../settings.ini')
             assert str(e.value) == CC_EXCEPT_EMPTY_HOST_OR_NAME
 
     def test_config_int_zeros(self):
@@ -31,5 +31,5 @@ class TestConfigContainer(unittest.TestCase):
                 mock.patch.object(ConfigParser, 'getint', return_value=0), \
                 mock.patch.object(ConfigParser, 'getboolean', return_value=False):
             with pytest.raises(ConfigError) as e:
-                ConfigContainer('settings.ini')
+                ConfigContainer('../settings.ini')
             assert str(e.value) == CC_EXCEPT_PORT_ZERO
