@@ -37,4 +37,5 @@ jobs:
       working-directory: .
       run: |
         echo "." >> $GITHUB_PATH
+        pwd
         pytest
