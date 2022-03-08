@@ -1,4 +1,4 @@
-[![Build+Testing](https://github.com/eng1neer-com/InterMumbleBot/actions/workflows/python-app.yml/badge.svg)](https://github.com/eng1neer-com/InterMumbleBot/actions/workflows/python-app.yml)
+[![Python application](https://github.com/eng1neer-com/InterMumbleBot/actions/workflows/python-app.yml/badge.svg)](https://github.com/eng1neer-com/InterMumbleBot/actions/workflows/python-app.yml)
 
 # InterMumbleBot
 Receive information about users on other server
