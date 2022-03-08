@@ -21,6 +21,7 @@ class InterMumbleBot:
 
 if __name__ == '__main__':
     config = ConfigContainer(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'settings.ini'))
+    config.read_config()
     myInterMumbleBot = InterMumbleBot(config, 2)
     myInterMumbleBot.loop()
 

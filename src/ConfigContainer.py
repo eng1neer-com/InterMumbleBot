@@ -21,16 +21,14 @@ class ConfigContainer:
         self.public_reply = None
         self.broadcast_changes = None
         self.filename = filename
-        self.__check_filename()
-        self.__read_config()
-        self.__check_config()
 
     def __check_filename(self):
         if not exists(self.filename):
             print(self.filename)
             raise ConfigError(CC_EXCEPT_NO_INI_FILE)
 
-    def __read_config(self):
+    def read_config(self):
+        self.__check_filename()
         try:
             conf_parser = ConfigParser()
             conf_parser.read(self.filename)
@@ -48,6 +46,7 @@ class ConfigContainer:
                 self.bot_certificate = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', bot_cert_temp)
         except ValueError:
             raise ConfigError(CC_EXCEPT_INI_NOT_VALID)
+        self.__check_config()
 
     def __check_config(self):
         if not self.bot_name or not self.hostname1 or not self.hostname2:
