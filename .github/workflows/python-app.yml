@@ -36,4 +36,5 @@ jobs:
     - name: Test with pytest
       working-directory: .
       run: |
+        echo "." >> $GITHUB_PATH
         pytest
