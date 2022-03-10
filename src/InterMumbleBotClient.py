@@ -1,10 +1,12 @@
+import time
+import logging
+
 from pymumble_py3 import Mumble
 from pymumble_py3.constants import PYMUMBLE_CLBK_TEXTMESSAGERECEIVED, PYMUMBLE_CLBK_USERCREATED, \
-    PYMUMBLE_CLBK_USERREMOVED, PYMUMBLE_CLBK_CONNECTED, PYMUMBLE_CONN_STATE_CONNECTED
+    PYMUMBLE_CLBK_USERREMOVED, PYMUMBLE_CLBK_CONNECTED, PYMUMBLE_CONN_STATE_CONNECTED, PYMUMBLE_CLBK_DISCONNECTED
 from pymumble_py3.errors import UnknownChannelError
 from pymumble_py3.mumble_pb2 import TextMessage as Message
 from Constants import *
-import time
 
 
 def send_multi_line_msg(send_function, messages):
@@ -45,15 +47,6 @@ def update_channel_name(connected, users, bot_name):
     return channel_name
 
 
-def channel_exists(channels, own_channel_id):
-    exists = True
-    try:
-        channels[own_channel_id]
-    except KeyError:
-        exists = False
-    return exists
-
-
 def handle_message(message, remote_users, my_channel, users, channels, public_reply):
     output = []
     if message.channel_id:  # request from channel
@@ -90,16 +83,17 @@ def recreate_channel(channels, channel_name):
     if not ch_exists:
         channels.new_channel(0, channel_name, True)  # create temporary channel
         time.sleep(1)
-    try:
-        own_channel_id = channels.find_by_name(channel_name)['channel_id']
-    except UnknownChannelError:
-        own_channel_id = 0
-    return own_channel_id
+
+
+def get_current_channel(mumble):
+    return mumble.channels[mumble.users.myself['channel_id']]['name']
 
 
 class InterMumbleBotClient:
 
     def __init__(self, bot_num, settings):
+        logging.basicConfig(filename='../InterMumbleBot.log', filemode='a', level=logging.DEBUG,
+                            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         self.bot_name = settings.bot_name
         self.bot_num = bot_num
         self.message = Message()
@@ -110,7 +104,6 @@ class InterMumbleBotClient:
         self.fresh_connect = False
         self.broadcast_changes = settings.broadcast_changes
         self.public_reply = settings.public_reply
-        self.own_channel_id = -1  # ID of created channel
         if bot_num == 1:
             hostname = settings.hostname1
             port = settings.port1
@@ -129,6 +122,7 @@ class InterMumbleBotClient:
         self.mumble.callbacks.set_callback(PYMUMBLE_CLBK_USERCREATED, self.user_added)
         self.mumble.callbacks.set_callback(PYMUMBLE_CLBK_USERREMOVED, self.user_removed)
         self.mumble.callbacks.set_callback(PYMUMBLE_CLBK_CONNECTED, self.connected)
+        self.mumble.callbacks.set_callback(PYMUMBLE_CLBK_DISCONNECTED, self.disconnected)
 
     def start(self):
         self.mumble.start()
@@ -151,14 +145,20 @@ class InterMumbleBotClient:
 
     def connected(self):
         self.fresh_connect = True
+        logging.info("Bot" + str(self.bot_num) + ' connected to server')
+
+    def disconnected(self):
+        logging.warning("Bot" + str(self.bot_num) + ' disconnected')
 
     def loop(self, remote_mumble):
         if self.mumble.connected == PYMUMBLE_CONN_STATE_CONNECTED:
             if self.fresh_connect:
                 self.fresh_connect = False
                 self.remote_user_list = get_real_users(remote_mumble.users, self.bot_name)
-                self.channel_name = update_channel_name(remote_mumble.connected, remote_mumble.users, self.bot_name)
-                self.own_channel_id = recreate_channel(self.mumble.channels, self.channel_name)
+                channel_name_demand = update_channel_name(remote_mumble.connected, remote_mumble.users, self.bot_name)
+                recreate_channel(self.mumble.channels, self.channel_name)
+                self.channel_name = get_current_channel(self.mumble)
+                logging.info("Bot" + str(self.bot_num) + ' created initial channel: ' + self.channel_name)
             else:
                 # handle user update
                 remote_user_list = get_real_users(remote_mumble.users, self.bot_name)
@@ -170,14 +170,16 @@ class InterMumbleBotClient:
                         broadcast_userchange(users_left, users_joined, self.mumble.channels)
 
                 # handle channel update
-                channel_name = update_channel_name(remote_mumble.connected, remote_mumble.users, self.bot_name)
-                if channel_name != self.channel_name or not channel_exists(self.mumble.channels, self.own_channel_id):
-                    self.channel_name = channel_name
-                    self.own_channel_id = recreate_channel(self.mumble.channels, self.channel_name)
-                    time.sleep(1)
+                channel_name_demand = update_channel_name(remote_mumble.connected, remote_mumble.users, self.bot_name)
+                channel_name_actual = get_current_channel(self.mumble)
+                if channel_name_actual != channel_name_demand:
+                    recreate_channel(self.mumble.channels, channel_name_demand)
+                    logging.info("Bot" + str(self.bot_num) + " channel update: " + self.channel_name)
+                    self.channel_name = get_current_channel(self.mumble)
 
                 # handle commands received via chat
                 if self.new_message:
                     self.new_message = False
                     handle_message(self.message, self.remote_user_list, self.mumble.my_channel(),
                                    self.mumble.users, self.mumble.channels, self.public_reply)
+
