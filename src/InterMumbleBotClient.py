@@ -72,21 +72,28 @@ def handle_message(message, remote_users, my_channel, users, channels, public_re
     send_multi_line_msg(send_function, output)
 
 
-def recreate_channel(channels, channel_name):
+def recreate_channel(channels, ch_name_demand, myself, bot_num):
     ch_exists = True
     try:
-        channel = channels.find_by_name(channel_name)  # check if channel already exists
+        channel = channels.find_by_name(ch_name_demand)  # check if channel already exists
         channel.move_in(session=None)
     except UnknownChannelError:
         ch_exists = False
 
     if not ch_exists:
-        channels.new_channel(0, channel_name, True)  # create temporary channel
+        channels.new_channel(0, ch_name_demand, True)  # create temporary channel
         time.sleep(1)
 
+    ch_name_actual = get_current_channel(channels, myself)
+    if ch_name_actual == ch_name_demand:
+        logging.info("Bot" + str(bot_num) + " channel update: " + ch_name_demand)
+    else:
+        logging.warning("Bot" + str(bot_num) + " channel creation failed. Demand: " + ch_name_demand
+                        + " # Actual: " + ch_name_actual)
 
-def get_current_channel(mumble):
-    return mumble.channels[mumble.users.myself['channel_id']]['name']
+
+def get_current_channel(channels, myself):
+    return channels[myself['channel_id']]['name']
 
 
 class InterMumbleBotClient:
@@ -99,7 +106,6 @@ class InterMumbleBotClient:
         self.message = Message()
         self.new_message = False  # user sent message on local server
         self.user_changed = False  # user joined/left on local server
-        self.channel_name = IMB_INITIAL_CH_NAME
         self.remote_user_list = {}
         self.fresh_connect = False
         self.broadcast_changes = settings.broadcast_changes
@@ -156,9 +162,7 @@ class InterMumbleBotClient:
                 self.fresh_connect = False
                 self.remote_user_list = get_real_users(remote_mumble.users, self.bot_name)
                 channel_name_demand = update_channel_name(remote_mumble.connected, remote_mumble.users, self.bot_name)
-                recreate_channel(self.mumble.channels, self.channel_name)
-                self.channel_name = get_current_channel(self.mumble)
-                logging.info("Bot" + str(self.bot_num) + ' created initial channel: ' + self.channel_name)
+                recreate_channel(self.mumble.channels, channel_name_demand, self.mumble.users.myself, self.bot_num)
             else:
                 # handle user update
                 remote_user_list = get_real_users(remote_mumble.users, self.bot_name)
@@ -171,15 +175,12 @@ class InterMumbleBotClient:
 
                 # handle channel update
                 channel_name_demand = update_channel_name(remote_mumble.connected, remote_mumble.users, self.bot_name)
-                channel_name_actual = get_current_channel(self.mumble)
+                channel_name_actual = get_current_channel(self.mumble.channels, self.mumble.users.myself)
                 if channel_name_actual != channel_name_demand:
-                    recreate_channel(self.mumble.channels, channel_name_demand)
-                    logging.info("Bot" + str(self.bot_num) + " channel update: " + self.channel_name)
-                    self.channel_name = get_current_channel(self.mumble)
+                    recreate_channel(self.mumble.channels, channel_name_demand, self.mumble.users.myself, self.bot_num)
 
                 # handle commands received via chat
                 if self.new_message:
                     self.new_message = False
                     handle_message(self.message, self.remote_user_list, self.mumble.my_channel(),
                                    self.mumble.users, self.mumble.channels, self.public_reply)
-
