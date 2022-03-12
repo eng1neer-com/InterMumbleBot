@@ -1,5 +1,6 @@
 import time
 import logging
+import os
 
 from pymumble_py3 import Mumble
 from pymumble_py3.constants import PYMUMBLE_CLBK_TEXTMESSAGERECEIVED, PYMUMBLE_CLBK_USERCREATED, \
@@ -99,7 +100,8 @@ def get_current_channel(channels, myself):
 class InterMumbleBotClient:
 
     def __init__(self, bot_num, settings):
-        logging.basicConfig(filename='../InterMumbleBot.log', filemode='a', level=logging.DEBUG,
+        log_file = (os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'InterMumbleBot.log'))
+        logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG,
                             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         self.bot_name = settings.bot_name
         self.bot_num = bot_num
