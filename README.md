@@ -15,6 +15,9 @@ libopus0
 - If registered with server: Will create temporary channel indicating the user count of the other server
 - Usernames of other server can be requested by a private message "!users"
 
+## Screenshots
+![screenshot](https://user-images.githubusercontent.com/97258440/159071121-7138c67a-736f-4083-95a4-cd59942ac423.PNG)
+
 ## How to start:
 Install necessary linux packages:
 ```
