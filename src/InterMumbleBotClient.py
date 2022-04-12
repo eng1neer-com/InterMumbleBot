@@ -123,8 +123,8 @@ class InterMumbleBotClient:
         else:
             raise Exception(IBM_EXCEPT_INVALID_BOT_NR)
 
-        self.mumble = Mumble(hostname, settings.bot_name, port=port, password=pw, certfile=settings.bot_certificate,
-                             keyfile=None, reconnect=True, tokens=[], stereo=False,
+        self.mumble = Mumble(hostname, settings.bot_name, port=port, password=pw, certfile=settings.cert,
+                             keyfile=settings.key, reconnect=True, tokens=[], stereo=False,
                              debug=False)
         self.mumble.callbacks.set_callback(PYMUMBLE_CLBK_TEXTMESSAGERECEIVED, self.msg_received)
         self.mumble.callbacks.set_callback(PYMUMBLE_CLBK_USERCREATED, self.user_added)

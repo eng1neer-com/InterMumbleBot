@@ -10,7 +10,8 @@ class ConfigError(Exception):
 
 class ConfigContainer:
     def __init__(self, filename):
-        self.bot_certificate = None
+        self.cert = None
+        self.key = None
         self.pw2 = None
         self.pw1 = None
         self.port2 = None
@@ -42,8 +43,11 @@ class ConfigContainer:
             self.public_reply = conf_parser.getboolean('bot-settings', 'public_reply')
             self.broadcast_changes = conf_parser.getboolean('bot-settings', 'broadcast_changes')
             bot_cert_temp = conf_parser.get('bot-settings', 'certificate')
+            bot_key_temp = conf_parser.get('bot-settings', 'private_key')
             if bot_cert_temp:
-                self.bot_certificate = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', bot_cert_temp)
+                self.cert = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', bot_cert_temp)
+            if bot_key_temp:
+                self.key = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', bot_key_temp)
         except ValueError:
             raise ConfigError(CC_EXCEPT_INI_NOT_VALID)
         self.__check_config()
