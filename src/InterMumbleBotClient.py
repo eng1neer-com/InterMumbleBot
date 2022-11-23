@@ -56,8 +56,11 @@ def handle_message(message, remote_users, my_channel, users, channels, public_re
         if not public_reply:
             send_function = users[message.actor].send_text_message  # send answer to user directly
         else:
-            origin_channel = users[message.actor]['channel_id']
-            send_function = channels[origin_channel].send_text_message  # send answer to channel of user
+            if message.actor == 0:
+                send_function = None
+            else:
+                origin_channel = users[message.actor]['channel_id']
+                send_function = channels[origin_channel].send_text_message  # send answer to channel of user
     message = message.message.strip()
 
     if message == IMB_CMD_USERS:
@@ -69,8 +72,9 @@ def handle_message(message, remote_users, my_channel, users, channels, public_re
             output.append(IMB_CHAT_NO_USERS_FEEDBACK)
     elif message == IMB_CMD_HELP:
         output.append(IMB_CHAT_HELP_MSG_PREFIX + " " + IMB_CMD_USERS + " " + IMB_CHAT_HELP_MSG_POSTFIX)
-
-    send_multi_line_msg(send_function, output)
+    
+    if send_function:
+        send_multi_line_msg(send_function, output)
 
 
 def recreate_channel(channels, ch_name_demand, myself, bot_num):
