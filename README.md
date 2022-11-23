@@ -21,7 +21,7 @@ libopus0
 ## How to start:
 Install necessary linux packages:
 ```
-apt update && apt get install python3 python3.8-venv libopus0 -y
+apt update && apt install python3 python3.8-venv libopus0 -y
 ```
 Clone this repo to your local folder
 ```
@@ -49,7 +49,7 @@ deactivate
 ```
 Create certificate and key for bot
 ```
-openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out $
+openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem
 ```
 Create local settings file and set parameter
 ```
