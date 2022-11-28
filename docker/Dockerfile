@@ -1,5 +1,7 @@
 FROM ubuntu:latest
 
+ARG VERSION=v0.21
+
 # linux packages
 RUN apt update && \
     apt install python3 python3-pip libopus0 -y
@@ -8,7 +10,7 @@ RUN apt install git -y
 # get code
 RUN mkdir -p /opt && \
     cd /opt && \
-    git clone https://github.com/eng1neer-com/InterMumbleBot && \
+    git clone https://github.com/eng1neer-com/InterMumbleBot --branch $VERSION && \
     cd InterMumbleBot
 
 # pip packages
