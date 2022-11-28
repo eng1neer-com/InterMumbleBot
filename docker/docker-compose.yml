@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  intermumblebot:
+    build: "."
+    volumes:
+      - ./settings:/data
