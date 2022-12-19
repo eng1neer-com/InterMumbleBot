@@ -34,7 +34,7 @@ def get_real_users(users, bot_name):
     real_users = []
     for user in users:
         username = users[user]['name']
-        if not username.lower().__contains__('bot') and not username == bot_name:
+        if not username.lower().__contains__('bot') and not username == bot_name and not username.lower().__contains__('mimic'):
             real_users.append(username)
     return real_users
 
