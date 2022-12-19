@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-ARG VERSION=v0.22
+ARG VERSION=v0.23
 
 # linux packages
 RUN apt update && \
